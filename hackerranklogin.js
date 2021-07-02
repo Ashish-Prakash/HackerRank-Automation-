@@ -1,5 +1,5 @@
 const puppeteer = require("puppeteer");
-const id = "xohej77478@paseacuba.com";
+const id = "wijigo4829@nnacell.com";
 const pass = "123456789";
 let tab;
 let gcode;
@@ -62,6 +62,13 @@ let browserpromise = puppeteer.launch(
     // console.log(completeLink);
     // return completeLink;
     let oneQuestionSolvePromise = solveQuesiton(completeLink[0]);
+    // return oneQuestionSolvePromise;
+    for(let i=1;i<oneQuestionSolvePromise.length;i++){
+        let oneQuestionSolvePromise =  oneQuestionSolvePromise.then(function(){
+            let nextQuestionSolvePromise = solveQuesiton(completeLink[i]);
+            return nextQuestionSolvePromise;
+        })
+    }
     return oneQuestionSolvePromise;
 })
 
@@ -187,6 +194,30 @@ function Pastecode(){
         })
     })
 }
+
+function editorialLock(){
+    return new Promise(function(resolve,reject){
+        let tablockPromise = tab.waitForSelector('ui-btn ui-btn-normal ui-btn-primary ui-btn-styled',{visible:true, timeout: 5000});
+        tablockPromise
+        .then(function(){
+            let openLock = tab.$('ui-btn ui-btn-normal ui-btn-primary ui-btn-styled');
+            return openLock; 
+        })
+        .then(function(openLock){
+            console.log(openLock);
+            lockButtonclick = openLock.click();
+            return lockButtonclick;
+        })
+        .then(function(){
+            console.log("button Found");
+            resolve();
+        })
+        .catch(function(error){
+            console.log("Button not found")
+            resolve();
+        })
+    })
+}
   
 function solveQuesiton(Qlink)
 {
@@ -199,6 +230,10 @@ function solveQuesiton(Qlink)
             return waitAndClickPromise;
         })
         .then(function(){
+            let unlockcode = editorialLock();
+            return unlockcode;
+        })
+        .then(function(){
             let codeNamePromise = getcode();
             return codeNamePromise;
         })
@@ -209,6 +244,10 @@ function solveQuesiton(Qlink)
         .then(function(){
             let RunProgram = tab.click('#content > div > div > div > div > div.community-content > div > section > div > div > div > div.full-screen-split.split-wrap.left-pane > section.code-editor-section.split > div:nth-child(1) > div > div.hr-monaco-editor-wrapper > div > div:nth-child(1) > div.pmR.pmL.pmB.plT.run-code-wrapper > button.ui-btn.ui-btn-normal.ui-btn-secondary.pull-right.msR.hr-monaco-compile.hr-monaco__run-code.ui-btn-styled');
             return RunProgram;
+        })
+        .then(function(){
+            let submitProgram = tab.click(".ui-btn-primary");
+            return submitProgram;
         })
         .then(function(){
             resolve();
